@@ -1,0 +1,94 @@
+/* Board, probation, reports, offers, joining, careers and the candidate's status page. Same tokens as the rest. */
+
+/* Notification bell (top right, above the page) */
+.bell {
+  position: fixed; top: var(--s4); right: var(--s6); z-index: 20;
+  width: 40px; height: 40px; display: grid; place-items: center;
+  border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+  text-decoration: none;
+}
+.bell:hover { color: var(--ink); border-color: var(--ink-3); }
+.bell-count {
+  position: absolute; transform: translate(14px, -14px);
+  min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-round);
+  background: var(--accent); color: var(--accent-ink); font-size: var(--t-xs); font-weight: 700;
+  display: grid; place-items: center;
+}
+.bell { overflow: visible; }
+
+.chip-btn { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 2px 8px; margin: 0 2px; cursor: pointer; color: var(--ink); font: inherit; font-size: var(--t-sm); }
+.chip-btn:hover { border-color: var(--accent); color: var(--accent); }
+.menu-why { color: var(--ink-3); font-size: var(--t-xs); }
+.strike { text-decoration: line-through; }
+
+/* Key numbers strip (Today) */
+.stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--s4); margin: 0 0 var(--s8); padding: var(--s4) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stats dt { font-size: var(--t-xs); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.stats dd { margin: 4px 0 0; font-size: var(--t-xl); font-weight: 600; }
+
+/* Board */
+.board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: var(--s3); overflow-x: auto; padding-bottom: var(--s3); }
+.board-col { background: var(--sunk); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s3); min-width: 230px; display: grid; align-content: start; gap: var(--s2); }
+.board-head { display: flex; justify-content: space-between; align-items: baseline; padding: 0 var(--s1); }
+.board-head h2 { font-size: var(--t-sm); text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); }
+.board-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.board-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s3); display: grid; gap: var(--s1); }
+.board-name { font-weight: 600; color: var(--ink); text-decoration: none; }
+.board-name:hover { color: var(--accent); }
+.board-meta { display: flex; gap: var(--s2); align-items: center; flex-wrap: wrap; }
+.board-next { color: var(--ink-2); }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); margin-top: var(--s1); }
+.board-move { min-height: 30px; padding: 0 var(--s2); font-size: var(--t-xs); }
+.board-empty { padding: var(--s2); }
+
+/* Documents, checks, tasks (joining and status page) */
+.doc-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.doc-row { display: grid; gap: var(--s2); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.doc-row:last-child { border-bottom: 0; }
+.doc-main { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.doc-row .round-actions { align-items: center; }
+.doc-row input:not([type="file"]) { flex: 1 1 200px; min-width: 160px; }
+.check-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2) var(--s6); }
+.check-item { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s2); align-items: center; padding: var(--s2) 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.check-item.is-done span:first-of-type { color: var(--ink-3); text-decoration: line-through; }
+
+/* Offers */
+.offer-card { display: grid; gap: var(--s3); }
+.offer-head { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.offer-head strong { font-size: var(--t-xl); }
+.letter { font-size: var(--t-sm); background: var(--paper); padding: var(--s4); border-radius: var(--radius); border: 1px solid var(--line); }
+details summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+
+/* Pips */
+.pip { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s4); display: grid; gap: var(--s2); margin-bottom: var(--s3); background: var(--surface); }
+
+/* Reports */
+.funnel { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); max-width: 720px; }
+.funnel-row { display: grid; grid-template-columns: 180px 1fr 48px; gap: var(--s3); align-items: center; }
+.funnel-bar { height: 10px; background: var(--sunk); border-radius: var(--radius); overflow: hidden; }
+.funnel-bar span { display: block; height: 100%; background: var(--accent); border-radius: var(--radius); }
+.funnel-count { text-align: right; }
+
+/* Careers and the candidate's page (public) */
+.public { min-height: 100vh; }
+.public-top { padding: var(--s4) var(--s6); border-bottom: 1px solid var(--line); background: var(--surface); }
+.public-brand { text-decoration: none; color: inherit; }
+.public-main { max-width: 760px; margin: 0 auto; padding: var(--s8) var(--s4); display: grid; gap: var(--s6); }
+.public-head h1 { margin-top: var(--s1); }
+.role-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); }
+.role-item { display: flex; justify-content: space-between; align-items: center; gap: var(--s4); padding: var(--s4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); flex-wrap: wrap; }
+.role-title { font-weight: 600; font-size: var(--t-lg); color: var(--ink); text-decoration: none; }
+.role-title:hover { color: var(--accent); }
+.role-meta { display: flex; gap: var(--s1); align-items: center; flex-wrap: wrap; margin-top: 2px; }
+.role-skills { margin-top: var(--s2); color: var(--ink-2); }
+.public .btn-primary { text-decoration: none; }
+
+@media (max-width: 1100px) {
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 800px) {
+  .bell { top: auto; bottom: var(--s4); right: var(--s4); }
+  .check-grid { grid-template-columns: 1fr; }
+  .funnel-row { grid-template-columns: 120px 1fr 40px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

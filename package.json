@@ -1,0 +1,17 @@
+{
+  "name": "hiretrack",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c auto \"npm run dev -w server\" \"npm run dev -w web\"",
+    "test": "npm test -w server && npm test -w web",
+    "seed": "npm run seed -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

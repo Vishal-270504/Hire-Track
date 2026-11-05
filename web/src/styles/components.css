@@ -1,0 +1,48 @@
+.pill {
+  display: inline-flex; align-items: center; gap: var(--s1);
+  padding: 2px var(--s2); border-radius: var(--radius);
+  font-size: var(--t-xs); font-weight: 600; white-space: nowrap;
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: 40px; padding: 0 var(--s4);
+  border-radius: var(--radius); border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink); cursor: pointer;
+  transition: background var(--ease), border-color var(--ease);
+}
+.btn:hover:not(:disabled) { border-color: var(--ink-3); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-danger { background: var(--bad); color: #fff; border-color: var(--bad); }
+.btn-ghost { background: transparent; border-color: transparent; }
+
+.field { display: grid; gap: var(--s1); }
+.field label { font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); }
+.field input, .field select, .field textarea {
+  min-height: 40px; padding: var(--s2) var(--s3);
+  border-radius: var(--radius); border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink);
+}
+.field textarea { min-height: 96px; resize: vertical; }
+.field [aria-invalid="true"] { border-color: var(--bad); }
+.field-msg { font-size: var(--t-xs); }
+
+.empty { padding: var(--s8); text-align: left; display: grid; gap: var(--s2); justify-items: start; }
+.skeleton {
+  height: 44px; margin-bottom: var(--s2); border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--sunk), var(--line), var(--sunk));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.dialog {
+  width: min(480px, calc(100vw - 32px)); padding: var(--s6);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); color: var(--ink);
+}
+.dialog::backdrop { background: rgba(20, 18, 14, 0.4); }
+.dialog-body { margin: var(--s3) 0 var(--s6); }
+.dialog-foot { display: flex; justify-content: flex-end; gap: var(--s2); }

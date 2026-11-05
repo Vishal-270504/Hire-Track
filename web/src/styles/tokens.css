@@ -1,0 +1,97 @@
+/*
+ * Design tokens. Every colour, radius, space and type size in the app comes from here.
+ * Direction: warm paper and ink, one deep teal accent, status colours only for state.
+ * No purple/blue gradients, no glass, no glow.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --paper: #f6f4ef;          /* app background */
+  --surface: #ffffff;        /* cards, tables, dialogs */
+  --sunk: #eeebe3;           /* nav, table headers, wells */
+  --line: #dcd7cb;           /* hairlines and borders */
+  --line-strong: #b9b3a4;
+
+  /* Text */
+  --ink: #1d1c19;
+  --ink-2: #4f4b43;
+  --ink-3: #757064;          /* secondary text, still AA on paper */
+
+  /* Accent: deep teal. Primary actions and selection only. */
+  --accent: #0f5c55;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcebe8;
+  --accent-hover: #0b4a44;
+
+  /* Status: used for state, always paired with a word or icon */
+  --ok: #2f6b3a;     --ok-soft: #e1eedf;
+  --warn: #8a5a00;   --warn-soft: #f6ebcf;
+  --bad: #9b2f25;    --bad-soft: #f4dfdb;
+  --info: #3a5a7a;   --info-soft: #e0e8f0;
+
+  /* One radius for everything except avatars */
+  --radius: 6px;
+  --radius-round: 999px;
+
+  /* 4px space scale */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s6: 24px; --s8: 32px; --s12: 48px;
+
+  /* Type: workhorse sans, fixed scale (ratio 1.125) */
+  --font: "Public Sans Variable", "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: var(--font);
+  --t-xs: 0.78rem;
+  --t-sm: 0.875rem;
+  --t-md: 1rem;
+  --t-lg: 1.125rem;
+  --t-xl: 1.4rem;
+  --t-2xl: 1.8rem;
+
+  --shadow: 0 1px 0 rgba(29, 28, 25, 0.06);
+  --focus: 0 0 0 3px rgba(15, 92, 85, 0.35);
+  --ease: 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #161614;
+    --surface: #1f1e1b;
+    --sunk: #191816;
+    --line: #34322d;
+    --line-strong: #4a463e;
+    --ink: #ece9e1;
+    --ink-2: #bdb8ac;
+    --ink-3: #958f83;
+    --accent: #5fb3a8;
+    --accent-ink: #0f1f1d;
+    --accent-soft: #1d3530;
+    --accent-hover: #7cc4ba;
+    --ok: #8fcf9b;  --ok-soft: #1f3324;
+    --warn: #e6bd6a; --warn-soft: #3a2f16;
+    --bad: #f0a095;  --bad-soft: #3d2420;
+    --info: #9fbcd8; --info-soft: #1d2a38;
+    --shadow: none;
+    --focus: 0 0 0 3px rgba(95, 179, 168, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #161614;
+  --surface: #1f1e1b;
+  --sunk: #191816;
+  --line: #34322d;
+  --line-strong: #4a463e;
+  --ink: #ece9e1;
+  --ink-2: #bdb8ac;
+  --ink-3: #958f83;
+  --accent: #5fb3a8;
+  --accent-ink: #0f1f1d;
+  --accent-soft: #1d3530;
+  --accent-hover: #7cc4ba;
+  --ok: #8fcf9b;  --ok-soft: #1f3324;
+  --warn: #e6bd6a; --warn-soft: #3a2f16;
+  --bad: #f0a095;  --bad-soft: #3d2420;
+  --info: #9fbcd8; --info-soft: #1d2a38;
+  --shadow: none;
+  --focus: 0 0 0 3px rgba(95, 179, 168, 0.45);
+}
