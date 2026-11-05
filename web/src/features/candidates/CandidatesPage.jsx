@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
-import { useCandidatesQuery, useRequisitions, useViews, useCommand, REFRESH_ALL_CANDIDATE } from '../../lib/data.js';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, Search, X } from 'lucide-react';
+import { get, post } from '../../lib/api.js';
+import { useRequisitions, useViews, useCommand } from '../../lib/data.js';
 import { useAuthDownload } from '../reports/download.js';
-import { post } from '../../lib/api.js';
-import { useState as useLocalState } from 'react';
 import { STAGE_TEXT, statusTone, scoreTone, fmtAgo } from '../../lib/format.js';
 import { Button, Pill, PageHeader, DataTable, Dialog, Field } from '../../components/ui.jsx';
 import { Score } from '../../components/kit.jsx';
@@ -18,19 +18,51 @@ const STAGES = [
   { value: 'CLOSED', label: 'Closed' },
 ];
 
+const EMPTY_FILTERS = { q: '', stage: '', requisitionId: '', onHold: '', view: '' };
+
+/** Builds the query string from the filters that have a value. Every filter is sent together. */
+function toQuery(filters) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== '' && value != null) params.set(key, String(value));
+  }
+  return params.toString();
+}
+
 export default function CandidatesPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useState({ q: '', stage: '', requisitionId: '', onHold: '', view: '' });
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [saving, setSaving] = useState(false);
+  const [viewName, setViewName] = useState('');
+  const [shared, setShared] = useState(false);
   const views = useViews();
-  const download = useAuthDownload();
-  const [saving, setSaving] = useLocalState(false);
-  const [viewName, setViewName] = useLocalState('');
-  const [shared, setShared] = useLocalState(false);
-  const saveView = useCommand(() => post('/api/views', { name: viewName, filters: { stage: filters.stage, requisitionId: filters.requisitionId, onHold: filters.onHold, q: filters.q }, shared }), { refresh: [['views']], success: 'View saved.' });
-  const set = (k) => (e) => setFilters((f) => ({ ...f, [k]: e.target.value }));
-  const list = useCandidatesQuery(filters);
   const roles = useRequisitions();
-  const rows = list.data?.candidates ?? [];
+  const download = useAuthDownload();
+
+  const list = useQuery({
+    queryKey: ['candidates-list', filters],
+    queryFn: () => get(`/api/candidates?${toQuery(filters)}`).then((d) => d.candidates),
+    placeholderData: (prev) => prev,
+  });
+  const rows = list.data ?? [];
+
+  const saveView = useCommand(
+    () => post('/api/views', { name: viewName, filters, shared }),
+    { refresh: [['views']], success: 'View saved.' },
+  );
+
+  const set = (key) => (e) => setFilters((f) => ({ ...f, [key]: e.target.value }));
+  const hasFilters = Object.values(filters).some((v) => v !== '');
+
+  // A saved view restores every filter it was saved with. A ready-made view is just one more filter.
+  const pickView = (value) => {
+    if (value.startsWith('s:')) {
+      const saved = (views.data?.saved ?? []).find((x) => String(x.id) === value.slice(2));
+      if (saved) setFilters({ ...EMPTY_FILTERS, ...saved.filters });
+      return;
+    }
+    setFilters((f) => ({ ...f, view: value.startsWith('p:') ? value.slice(2) : '' }));
+  };
 
   const columns = [
     {
@@ -68,25 +100,20 @@ export default function CandidatesPage() {
         lead="Everyone in the process, in one list. Sort by what needs you. Click a name to open the full record."
         actions={
           <>
-            <Button onClick={() => download(`/api/candidates/export.xlsx?${new URLSearchParams(Object.entries({ stage: filters.stage, requisitionId: filters.requisitionId }).filter(([, v]) => v)).toString()}`, 'hiretrack-candidates.xlsx')}>Export to Excel</Button>
+            <Button onClick={() => download(`/api/candidates/export.xlsx?${toQuery({ stage: filters.stage, requisitionId: filters.requisitionId, onHold: filters.onHold })}`, 'hiretrack-candidates.xlsx')}>Export to Excel</Button>
             <Button onClick={() => setSaving(true)}>Save this view</Button>
             <Button variant="primary" onClick={() => navigate('/candidates/new')}><Plus size={16} aria-hidden="true" /> Add candidate</Button>
           </>
         }
       />
+
       <div className="filters" role="search">
         <label className="search">
           <Search size={16} aria-hidden="true" />
           <span className="sr-only">Search by name, email, phone, PAN or role</span>
           <input type="search" placeholder="Name, email, phone, PAN or role" value={filters.q} onChange={set('q')} />
         </label>
-        <Select aria-label="Ready-made or saved view" value={filters.view ? `p:${filters.view}` : ''} onChange={(e) => {
-          const v = e.target.value;
-          if (v.startsWith('s:')) {
-            const saved = (views.data?.saved ?? []).find((x) => String(x.id) === v.slice(2));
-            setFilters({ q: saved?.filters.q ?? '', stage: saved?.filters.stage ?? '', requisitionId: saved?.filters.requisitionId ?? '', onHold: saved?.filters.onHold ?? '', view: '' });
-          } else setFilters((f) => ({ ...f, view: v.startsWith('p:') ? v.slice(2) : '' }));
-        }}>
+        <Select aria-label="Ready-made or saved view" value={filters.view ? `p:${filters.view}` : ''} onChange={(e) => pickView(e.target.value)}>
           <option value="">All candidates</option>
           <optgroup label="Ready-made">
             {(views.data?.presets ?? []).map((p) => <option key={p.id} value={`p:${p.id}`}>{p.label}</option>)}
@@ -97,7 +124,7 @@ export default function CandidatesPage() {
             </optgroup>
           )}
         </Select>
-        <Select aria-label="Stage" value={filters.stage} onChange={set('stage')} disabled={!!filters.view}>
+        <Select aria-label="Stage" value={filters.stage} onChange={set('stage')}>
           {STAGES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
         </Select>
         <Select aria-label="Role" value={filters.requisitionId} onChange={set('requisitionId')}>
@@ -109,7 +136,11 @@ export default function CandidatesPage() {
           <option value="true">On hold</option>
           <option value="false">Active</option>
         </Select>
+        {hasFilters && (
+          <Button variant="ghost" onClick={() => setFilters(EMPTY_FILTERS)}><X size={16} aria-hidden="true" /> Clear filters</Button>
+        )}
       </div>
+
       <DataTable
         columns={columns}
         rows={rows}
@@ -118,19 +149,40 @@ export default function CandidatesPage() {
         onRetry={() => list.refetch()}
         rowKey={(c) => c.id}
         onRowClick={(c) => navigate(`/candidates/${c.id}`)}
-        empty={{ title: filters.q || filters.stage || filters.requisitionId ? 'No one matches these filters' : 'No candidates yet', body: 'Add a candidate from a resume or by hand.' }}
+        empty={{
+          title: hasFilters ? 'No one matches these filters' : 'No candidates yet',
+          body: hasFilters ? 'Try a different view, or clear the filters.' : 'Add a candidate from a resume or by hand.',
+        }}
       />
       {rows.length > 0 && <p className="muted small mt">{rows.length} shown</p>}
-      {saving && (
-        <Dialog open title="Save this view" onClose={() => setSaving(false)}
-          footer={<><Button onClick={() => setSaving(false)}>Cancel</Button><Button variant="primary" disabled={viewName.trim().length < 2}
-            onClick={() => saveView.mutate(undefined, { onSuccess: () => { setSaving(false); setViewName(''); setShared(false); } })}>Save view</Button></>}>
-          <div className="stack">
-            <Field label="Name"><input value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="For example: Java shortlist, Pune" /></Field>
-            <label className="check"><input type="checkbox" checked={shared} onChange={(e) => setShared(e.target.checked)} /> Share with the team</label>
-          </div>
-        </Dialog>
-      )}
+
+      <Dialog
+        open={saving}
+        title="Save this view"
+        onClose={() => setSaving(false)}
+        footer={
+          <>
+            <Button onClick={() => setSaving(false)}>Cancel</Button>
+            <Button
+              variant="primary"
+              disabled={viewName.trim().length < 2 || saveView.isPending}
+              onClick={() => saveView.mutate(undefined, {
+                onSuccess: () => { setSaving(false); setViewName(''); setShared(false); },
+              })}
+            >
+              Save view
+            </Button>
+          </>
+        }
+      >
+        <div className="stack">
+          <p className="muted small">The view keeps every filter you have set now.</p>
+          <Field label="Name">
+            {(p) => <input {...p} value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="For example: Java shortlist, Pune" />}
+          </Field>
+          <label className="check"><input type="checkbox" checked={shared} onChange={(e) => setShared(e.target.checked)} /> Share with the team</label>
+        </div>
+      </Dialog>
     </>
   );
 }

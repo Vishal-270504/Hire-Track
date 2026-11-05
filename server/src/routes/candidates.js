@@ -6,27 +6,45 @@ import {
   startInterviews, rejectRoute, undoReject, withdraw, talentPool, setHold, assignOwner, addNote, moveJob,
   candidateHistory, bulkReject, bulkAssign, resumeIntakeHint,
 } from '../services/candidates.js';
-import { rule } from '../errors.js';
+import { PRESETS, presetIds } from '../services/tracker.js';
+import { rule, notFound } from '../errors.js';
 
 const idOf = (req) => Number(req.params.id);
-const reason = z.object({ reason: z.string().optional() });
+
+/**
+ * Parses the list filters from the query string. Empty values mean "no filter".
+ * Every filter is applied together, including a ready-made view (view=...).
+ */
+function listFilters(q) {
+  const text = (v) => (typeof v === 'string' && v.trim() !== '' ? v.trim() : undefined);
+  const number = (v) => (text(v) && !Number.isNaN(Number(v)) ? Number(v) : undefined);
+  const flag = (v) => (v === 'true' ? true : v === 'false' ? false : undefined);
+  return {
+    q: text(q.q),
+    stage: text(q.stage),
+    requisitionId: number(q.requisitionId),
+    onHold: flag(q.onHold),
+    ownerId: number(q.ownerId),
+    view: text(q.view),
+  };
+}
 
 export async function candidateRoutes(app) {
   const now = () => app.clock.now();
 
+  // The candidate list. All filters apply together: search, stage, role, hold, owner and view.
   app.get('/api/candidates', async (req) => {
     const actor = needCan(req, 'candidate.read');
-    const q = req.query;
-    return {
-      candidates: listCandidates(app.db, actor, {
-        stage: q.stage || undefined,
-        requisitionId: q.requisitionId ? Number(q.requisitionId) : undefined,
-        q: q.q || undefined,
-        status: q.status || undefined,
-        onHold: q.onHold === undefined ? undefined : q.onHold === 'true',
-        ownerId: q.ownerId ? Number(q.ownerId) : undefined,
-      }),
-    };
+    const f = listFilters(req.query);
+    let rows = listCandidates(app.db, actor, {
+      q: f.q, stage: f.stage, requisitionId: f.requisitionId, onHold: f.onHold, ownerId: f.ownerId,
+    });
+    if (f.view) {
+      if (!PRESETS.some((p) => p.id === f.view)) throw notFound('That view');
+      const ids = presetIds(app.db, f.view, actor, now());
+      rows = rows.filter((c) => ids.has(c.id));
+    }
+    return { candidates: rows };
   });
 
   // Turns an uploaded resume into text for the form. Scanned files come back empty with a hint.
