@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "concurrently -n api,web -c auto \"npm run dev -w server\" \"npm run dev -w web\"",
     "test": "npm test -w server && npm test -w web",
-    "seed": "npm run seed -w server"
+    "seed": "npm run seed -w server",
+    "seed:demo": "npm run seed:demo -w server --"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

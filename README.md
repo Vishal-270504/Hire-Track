@@ -58,6 +58,19 @@ On the sign-in page, click a role to fill it in. The password for every demo acc
 | **Careers and candidate page** | Public role list (no budget shown); apply with consent; a private status page with the candidate's documents to upload and their offer to accept, negotiate or decline |
 | **Settings** | Every number and message from the plan, with its value, validation (weights total 100) and reset; message text for invitations, reminders, letters and the company name |
 
+## Demo data
+
+To fill the app with realistic example data (roles, candidates at every stage, an employee on probation, an employee already confirmed, offers, reminders and a saved view):
+
+```bash
+npm run seed:demo
+```
+
+- It only adds data to an empty database. If candidates already exist, it adds nothing.
+- To start completely clean, stop the app (`Ctrl+C`), then run `npm run seed:demo -- --reset`, and start the app again.
+- The data is created through the same services the app uses, so the timelines, audit trail and reminders are real.
+- Sign in as `hr@hiretrack.local` with password `hiretrack-demo` to see everything.
+
 ## Configuration
 
 | Variable | Default | What it does |

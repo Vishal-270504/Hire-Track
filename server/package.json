@@ -6,7 +6,8 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "seed": "node src/seed/run.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed:demo": "node src/seed/demo.js"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.1",
